@@ -5,7 +5,7 @@ include ../config.mk
 ifeq ($(WITH_TLS),yes)
 all : mosquitto mosquitto_passwd
 else
-all : mosquitto
+all : mosquitto mosquitto_passwd
 endif
 
 mosquitto : mosquitto.o bridge.o conf.o context.o database.o logging.o loop.o memory_mosq.o persist.o net.o net_mosq.o read_handle.o read_handle_client.o read_handle_server.o read_handle_shared.o security.o security_default.o send_client_mosq.o send_mosq.o send_server.o service.o subs.o sys_tree.o time_mosq.o tls_mosq.o util_mosq.o websockets.o will_mosq.o loop_epoll.o subs_fast.o

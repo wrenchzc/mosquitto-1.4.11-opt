@@ -24,7 +24,7 @@
 #define strerror_r(e, b, l) strerror_s(b, l, e)
 #endif
 
-
+void _mosquitto_free(void *mem);
 #define uthash_malloc(sz) _mosquitto_malloc(sz)
 #define uthash_free(ptr,sz) _mosquitto_free(ptr)
 

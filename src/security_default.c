@@ -37,6 +37,7 @@ int mosquitto_security_init_default(struct mosquitto_db *db, bool reload)
 {
 	int rc;
 
+	_mosquitto_log_printf(NULL, MOSQ_LOG_INFO, "try opening password file \"%s\".", db->config->password_file);
 	/* Load username/password data if required. */
 	if(db->config->password_file){
 		rc = _unpwd_file_parse(db);
@@ -716,12 +717,14 @@ int mosquitto_security_apply_default(struct mosquitto_db *db)
 		/* Check for anonymous clients when allow_anonymous is false */
 		if(!allow_anonymous && !context->username){
 			context->state = mosq_cs_disconnecting;			
+			send_notice_client_status(db, context->id, ONTICE_TYPE_OFFLINE, "Check for anonymous clients fail!");
 			do_disconnect(db, context);
 			continue;
 		}
 		/* Check for connected clients that are no longer authorised */
 		if(mosquitto_unpwd_check_default(db, context->username, context->password) != MOSQ_ERR_SUCCESS){
 			context->state = mosq_cs_disconnecting;			
+			send_notice_client_status(db, context->id, ONTICE_TYPE_OFFLINE, "Check for connected clients that are no longer authorised fail!");
 			do_disconnect(db, context);
 			continue;
 		}

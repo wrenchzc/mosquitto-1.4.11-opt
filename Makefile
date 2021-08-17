@@ -1,6 +1,6 @@
 include config.mk
 
-DIRS=lib client src
+DIRS=lib client src mosquitto-auth-plug
 DOCDIRS=man
 DISTDIRS=man
 

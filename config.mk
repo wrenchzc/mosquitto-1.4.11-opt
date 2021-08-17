@@ -21,15 +21,15 @@
 # Disabling this will also mean that passwords must be stored in plain text. It
 # is strongly recommended that you only disable WITH_TLS if you are not using
 # password authentication at all.
-#WITH_TLS:=yes
+WITH_TLS:=no
 
 # Comment out to disable TLS/PSK support in the broker and client. Requires
 # WITH_TLS=yes.
 # This must be disabled if using openssl < 1.0.
-#WITH_TLS_PSK:=yes
+WITH_TLS_PSK:=no
 
 # Comment out to disable client client threading support.
-#WITH_THREADING:=yes
+WITH_THREADING:=yes
 
 # Comment out to remove bridge support from the broker. This allow the broker
 # to connect to other brokers and subscribe/publish to topics. You probably
@@ -58,11 +58,11 @@
 WITH_SYS_TREE:=yes
 
 # Build with SRV lookup support.
-#WITH_SRV:=yes
+#WITH_SRV:=no
 
 # Build using libuuid for clientid generation (Linux only - please report if
 # supported on your platform).
-#WITH_UUID:=yes
+WITH_UUID:=yes
 
 # Build with websockets support on the broker.
 WITH_WEBSOCKETS:=no
@@ -74,7 +74,7 @@ WITH_EC:=yes
 WITH_DOCS:=yes
 
 # Build with client support for SOCK5 proxy.
-#WITH_SOCKS:=yes
+WITH_SOCKS:=yes
 
 # Build with async dns lookup support for bridges (temporary). Requires glibc.
 #WITH_ADNS:=yes

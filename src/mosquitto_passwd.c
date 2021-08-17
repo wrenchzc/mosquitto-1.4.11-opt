@@ -16,9 +16,11 @@ Contributors:
 
 
 #include <errno.h>
+#ifdef WITH_TLS
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 #include <openssl/buffer.h>
+#endif
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,6 +43,7 @@ Contributors:
 #define MAX_BUFFER_LEN 1024
 #define SALT_LEN 12
 
+#ifdef WITH_TLS
 int base64_encode(unsigned char *in, unsigned int in_len, char **encoded)
 {
 	BIO *bmem, *b64;
@@ -67,6 +70,7 @@ int base64_encode(unsigned char *in, unsigned int in_len, char **encoded)
 
 	return 0;
 }
+#endif
 
 
 void print_usage(void)
@@ -82,6 +86,7 @@ void print_usage(void)
 	printf("\nSee http://mosquitto.org/ for more information.\n\n");
 }
 
+#ifdef WITH_TLS
 int output_new_password(FILE *fptr, const char *username, const char *password)
 {
 	int rc;
@@ -147,6 +152,13 @@ int output_new_password(FILE *fptr, const char *username, const char *password)
 
 	return 0;
 }
+#else
+int output_new_password(FILE *fptr, const char *username, const char *password)
+{
+	fprintf(fptr, "%s:%s\n", username, password);
+	return 0;
+}
+#endif
 
 int delete_pwuser(FILE *fptr, FILE *ftmp, const char *username)
 {
@@ -375,7 +387,9 @@ int main(int argc, char *argv[])
 	signal(SIGINT, handle_sigint);
 	signal(SIGTERM, handle_sigint);
 
+    #ifdef WITH_TLS
 	OpenSSL_add_all_digests();
+	#endif
 
 	if(argc == 1){
 		print_usage();

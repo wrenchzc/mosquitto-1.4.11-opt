@@ -79,6 +79,7 @@ static void temp__expire_websockets_clients(struct mosquitto_db *db)
 						_mosquitto_log_printf(NULL, MOSQ_LOG_NOTICE, "Client %s has exceeded timeout, disconnecting.", id);
 					}
 					/* Client has exceeded keepalive*1.5 */
+					send_notice_client_status(db, context->id, ONTICE_TYPE_OFFLINE, "Client has exceeded keepalive*1.5!");				
 					do_disconnect(db, context);
 				}
 			}
@@ -202,6 +203,7 @@ int mosquitto_main_loop(struct mosquitto_db *db, mosq_sock_t *listensock, int li
 						context->pollfd_index = pollfd_index;
 						pollfd_index++;
 					}else{
+						send_notice_client_status(db, context->id, ONTICE_TYPE_OFFLINE, "write message fail!");					
 						do_disconnect(db, context);					
 					}
 				}else{
@@ -214,6 +216,7 @@ int mosquitto_main_loop(struct mosquitto_db *db, mosq_sock_t *listensock, int li
 						_mosquitto_log_printf(NULL, MOSQ_LOG_NOTICE, "Client %s has exceeded timeout, disconnecting.", id);
 					}
 					/* Client has exceeded keepalive*1.5 */
+					send_notice_client_status(db, context->id, ONTICE_TYPE_OFFLINE, "Client has exceeded keepalive*1.5");
 					do_disconnect(db, context);			
 				}
 			}
@@ -333,6 +336,7 @@ int mosquitto_main_loop(struct mosquitto_db *db, mosq_sock_t *listensock, int li
 #endif
 						context->clean_session = true;
 						context->state = mosq_cs_expiring;						
+						send_notice_client_status(db, context->id, ONTICE_TYPE_OFFLINE, "Expiring persistent client due to timeout");
 						do_disconnect(db, context);						
 					}
 				}
@@ -428,7 +432,7 @@ void do_disconnect(struct mosquitto_db *db, struct mosquitto *context)
 	if(context->state == mosq_cs_disconnected){
 		return;
 	}
-	send_notice_client_status(db, context->id, NOTICE_TYPE_OFFLINE);				
+	
 #ifdef WITH_WEBSOCKETS
 	if(context->wsi){
 		if(context->state != mosq_cs_disconnecting){
@@ -498,11 +502,13 @@ static void loop_handle_reads_writes(struct mosquitto_db *db, struct pollfd *pol
 						context->state = mosq_cs_new;
 					}
 				}else{
+					send_notice_client_status(db, context->id, ONTICE_TYPE_OFFLINE, "get socket option fail!");				
 					do_disconnect(db, context);				
 					continue;
 				}
 			}
 			if(_mosquitto_packet_write(NULL, context)){			
+				send_notice_client_status(db, context->id, ONTICE_TYPE_OFFLINE, "write packet fail!");
 				do_disconnect(db, context);		
 				continue;
 			}
@@ -522,12 +528,14 @@ static void loop_handle_reads_writes(struct mosquitto_db *db, struct pollfd *pol
 #endif
 			do{
 				if(_mosquitto_packet_read(db, context)){			
+					send_notice_client_status(db, context->id, ONTICE_TYPE_OFFLINE, "read packet fail!");
 					do_disconnect(db, context);				
 					continue;
 				}
 			}while(SSL_DATA_PENDING(context));
 		}
 		if(pollfds[context->pollfd_index].revents & (POLLERR | POLLNVAL | POLLHUP)){		
+			send_notice_client_status(db, context->id, ONTICE_TYPE_OFFLINE, "read POLLERR | POLLNVAL | POLLHUP from current socket");
 			do_disconnect(db, context);	
 			continue;
 		}
