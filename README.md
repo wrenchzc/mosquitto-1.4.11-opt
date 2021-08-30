@@ -49,12 +49,21 @@ auth_opt_port 3306
 auth_opt_dbname dbname
 auth_opt_user username
 auth_opt_pass password
-auth_opt_userquery SELECT pw FROM users WHERE username = '%s'
-# auth_opt_userquery SELECT pwhash FROM user WHERE username = '%s' AND clientid = '%s'
-# auth_opt_superquery SELECT COUNT(*) FROM users WHERE username = '%s' AND super = 1
-# auth_opt_aclquery SELECT topic FROM acls WHERE (username = '%s') AND (rw >= %d)
+auth_opt_userquery SELECT device_secret FROM lb_device WHERE device_sn = '%s'
+auth_opt_superquery SELECT COUNT(*) FROM iot_user WHERE username = '%s' AND is_super = 1
+auth_opt_aclquery SELECT topic FROM iot_acl WHERE (device_sn = '%s') AND (rw >= %d)
 # auth_opt_anonusername AnonymouS
 ```
+
+密码使用 mosquitto-auth-plug/np 生成
+用户缺省使用LbDevice表
+超级用户在　iotUser表中配置 isSuper属性需要设置为　1
+
+需要配置ACL
+deviceSn: 设备SN
+topic 需要配置的topic, 可以配置多条，　已权限最大的为准
+rw 权限　/* 0 无权限　1 只读　2　读写 */
+
 
 
 
